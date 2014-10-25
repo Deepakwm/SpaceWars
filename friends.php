@@ -5,9 +5,11 @@
 
                 <h3>Pending Requests</h3>
 
+
                 <?php
+                //incoming requests
                     $requests = 0;
-                    $stmt = $pdo->prepare("SELECT f.member_id, m.username, c.name as clan
+                    $stmt = $pdo->prepare("SELECT f.id, f.member_id, m.username, c.name as clan
                                            FROM friends as f
                                            JOIN members as m on m.id = f.member_id
                                            JOIN clans as c on c.id = m.clan_id
@@ -15,16 +17,27 @@
                     $stmt->execute(array($_SESSION['user_id']));
                     if ($stmt->rowcount() > 0) {
                         //pending incoming requests
-                        while ($row = $stmt->fetch()) {
+                        ?>
+                        <form role="addfriend" action="includes/add_friend.php" method="post">
+                        <?php
+                        $i = 1;
+                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                             ?>
                             <dt><a href="user.php?user=<?php echo $row['member_id']; ?>"><?php echo $row['username']; ?></a></dt>
                             <dt><?php echo $row['clan']; ?></dt>
-                            <dt><a href="#">Accept Friendship</a></dt>
+                            <dt><input type="checkbox" name="friend_id<?php echo $i ?>" id="friend_id<?php echo $i ?>" value=<?php echo $row['id']; ?> /></dt>
                             <?php
+                            $i++;
                         }
+                        ?>
+                        <button type="submit" value="AddFriends">Accept Friends</button>
+                        </form>
+                        <?php
                         $requests = 1;
                     }
 
+                    //outgoing requests
+                    /*
                     $stmt = $pdo->prepare("SELECT f.friend_id, m.username, c.name as clan
                                            FROM friends as f
                                            JOIN members as m on m.id = f.friend_id
@@ -40,7 +53,7 @@
                             <?php
                         }
                         $requests = 1;
-                    }
+                    } */
 
                     //if no pending requests
                     if ($requests != 1) {
