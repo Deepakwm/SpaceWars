@@ -5,7 +5,7 @@
             echo '<p class="error">Error Logging In!</p>';
         }
         ?>
-        <?php if (login_check($mysqli) == true) : ?>
+        <?php if (login_check($pdo) == true) : ?>
           <h3>You are currently logged in as <a href="profile.php"><?php echo htmlentities($_SESSION['username']) ?></a></h3>
           <h4><small>Not you? <a href="includes/logout.php">Logout</a></small></h4>
         <?php else : ?>
