@@ -1,17 +1,17 @@
 <?php include_once 'header.php'; ?>
     <div class='container'>
-        <?php if (login_check($mysqli) == true) : ?>
+        <?php if (login_check($pdo) == true) : ?>
             <h1>Welcome <?php echo htmlentities($_SESSION['username']); ?>!</h1>
                 <?php
                     $sql = 'SELECT *
-                        FROM combat
-                        WHERE (attacker_id =' . $_SESSION['user_id'] . 'OR defender_id =' . $_SESSION['user_id'] . ') AND `timestamp` BETWEEN DATE(adddate(now(),interval -1 day)) AND NOW()
-                        ORDER BY `timestamp`';
+                            FROM combat
+                            WHERE (attacker_id =' . $_SESSION['user_id'] . 'OR defender_id =' . $_SESSION['user_id'] . ') AND `timestamp` BETWEEN DATE(adddate(now(),interval -1 day)) AND NOW()
+                            ORDER BY `timestamp`';
 
-                    if ($result = $mysqli->query($sql)) {
+                    if ($result = $pdo->query($sql)) {
 
                         /* fetch object array */
-                        while ($row = $result->fetch_assoc()) {
+                        while ($row = $result->fetch()) {
 
                         }
                         /* free result set */
@@ -26,10 +26,10 @@
                         JOIN clans AS c ON c.id = m.clan_id
                         WHERE member_id =' . $_SESSION['user_id'];
 
-                    if ($result = $mysqli->query($sql)) {
+                    if ($result = $pdo->query($sql)) {
 
                         /* fetch object array */
-                        while ($row = $result->fetch_assoc()) { ?>
+                        while ($row = $result->fetch()) { ?>
 
                             <h3>Clan Information</h3>
                             <dl class='dl-horizontal'>
@@ -48,8 +48,6 @@
 
                             <?php
                         }
-                        /* free result set */
-                        $result->close();
                     }
                     else {
                         echo 'No Clan Selected';

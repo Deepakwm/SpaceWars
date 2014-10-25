@@ -2,16 +2,16 @@
 <?php if(isset($_GET['user'])) $user_id = $_GET['user'];
       else $user_id = ''; ?>
     <div class='container'>
-        <?php if (login_check($mysqli) == true) : ?>
+        <?php if (login_check($pdo) == true) : ?>
                  <?php
                     $sql = 'SELECT username, forename, surname, gender, birthday, is_premium, `timestamp`
                         FROM members
                         WHERE id =' . $user_id;
 
-                    if ($result = $mysqli->query($sql)) {
+                    if ($result = $pdo->query($sql)) {
 
                         /* fetch object array */
-                        while ($row = $result->fetch_assoc()) {
+                        while ($row = $result->fetch()) {
                             $birthday = date_create($row['birthday']);
                             $age = $birthday->diff(new DateTime('now'))->y;
                             switch ($row['gender']) {
@@ -46,9 +46,6 @@
                         </dl>
                         <?php
                         }
-
-                        /* free result set */
-                        $result->close();
                     }
                     else {
                         echo 'No user selected';

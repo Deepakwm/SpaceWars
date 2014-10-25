@@ -1,6 +1,6 @@
 <?php include_once 'header.php'; ?>
     <div class='container'>
-        <?php if (login_check($mysqli) == true) : ?>
+        <?php if (login_check($pdo) == true) : ?>
             <h1><?php echo htmlentities($_SESSION['username']); ?>'s Friends</h1>
 
                 <h3>Pending Requests</h3>
@@ -13,10 +13,10 @@
                             JOIN clans as c on c.id = m.clan_id
                             WHERE f.friend_id =' . $_SESSION['user_id'] . ' AND f.accepted = 0';
 
-                    if ($result = $mysqli->query($sql)) {
+                    if ($result = $pdo->query($sql)) {
 
                         /* fetch object array */
-                        while ($row = $result->fetch_assoc()) { ?>
+                        while ($row = $result->fetch()) { ?>
 
                             <dt><a href="user.php?user=<?php echo $row['member_id']; ?>"><?php echo $row['username']; ?></a></dt>
                             <dt><?php echo $row['clan']; ?></dt>
@@ -25,9 +25,6 @@
                         <?php
 
                         }
-
-                        /* free result set */
-                        $result->close();
                     }
 
 
@@ -37,10 +34,10 @@
                             JOIN clans as c on c.id = m.clan_id
                             WHERE f.member_id =' . $_SESSION['user_id'] . ' AND f.accepted = 0';
 
-                    if ($result = $mysqli->query($sql)) {
+                    if ($result = $pdo->query($sql)) {
 
                         /* fetch object array */
-                        while ($row = $result->fetch_assoc()) { ?>
+                        while ($row = $result->fetch()) { ?>
 
                             <dt><a href="user.php?user=<?php echo $row['friend_id']; ?>"><?php echo $row['username']; ?></a></dt>
                             <dt><?php echo $row['clan']; ?></dt>
@@ -48,9 +45,6 @@
                         <?php
 
                         }
-
-                        /* free result set */
-                        $result->close();
                     }
 
                 ?>
@@ -73,10 +67,10 @@
                         WHERE f.accepted = 1
                         ORDER BY m.username';
 
-                    if ($result = $mysqli->query($sql)) {
+                    if ($result = $pdo->query($sql)) {
 
                         /* fetch object array */
-                        while ($row = $result->fetch_assoc()) { ?>
+                        while ($row = $result->fetch()) { ?>
 
                             <dt><a href="user.php?user=<?php echo $row['friend']; ?>"><?php echo $row['username']; ?></a></dt>
                             <dt><?php echo $row['clan']; ?></dt>
@@ -86,9 +80,6 @@
                         <?php
 
                         }
-
-                        /* free result set */
-                        $result->close();
                     }
 
                 ?>

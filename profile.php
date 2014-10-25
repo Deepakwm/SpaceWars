@@ -1,16 +1,16 @@
 <?php include_once 'header.php'; ?>
     <div class='container'>
-        <?php if (login_check($mysqli) == true) : ?>
+        <?php if (login_check($pdo) == true) : ?>
             <h1>Welcome <?php echo htmlentities($_SESSION['username']); ?>!</h1>
                 <?php
                     $sql = 'SELECT forename, surname, gender, birthday, is_premium, `timestamp`
                         FROM members
                         WHERE id =' . $_SESSION['user_id'];
 
-                    if ($result = $mysqli->query($sql)) {
+                    if ($result = $pdo->query($sql)) {
 
                         /* fetch object array */
-                        while ($row = $result->fetch_assoc()) {
+                        while ($row = $result->fetch()) {
                             $forename = $row['forename'];
                             $surname = $row['surname'];
                             $birthday = date_create($row['birthday']);
@@ -34,9 +34,6 @@
                             }
                             $created = date_create($row['timestamp']);
                         }
-
-                        /* free result set */
-                        $result->close();
                     }
 
                 ?>

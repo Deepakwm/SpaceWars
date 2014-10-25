@@ -8,7 +8,7 @@ if (isset($_POST['email'], $_POST['p'])) {
     $email = $_POST['email'];
     $password = $_POST['p']; // The hashed password.
 
-    if (login($email, $password, $mysqli) == true) {
+    if (login($email, $password, $pdo) == true) {
         // Login success
         header('Location: ../main.php');
     } else {
