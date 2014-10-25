@@ -14,8 +14,6 @@
                         while ($row = $result->fetch()) {
 
                         }
-                        /* free result set */
-                        $result->close();
                     }
                     else {
                         echo 'No recent combat';

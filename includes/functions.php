@@ -50,13 +50,10 @@ function login($email, $password, $pdo) {
                     return true;
                 } else {
                     //invalid login attempt
-                    $now = time();
                     $user_id = $row['id'];
-                    /*$sql = "INSERT INTO login_attempts (user_id, time)
-                            VALUES (" . $user_id . ", '" . $now . "')";
-                    $pdo->query($sql);*/
-                    $pdo->query("INSERT INTO login_attempts(user_id, time)
-                                    VALUES ('$user_id', '$now')");
+                    $stmt = $pdo->prepare("INSERT INTO login_attempts(user_id, time)
+                                           VALUES ('$user_id', now())");
+                    $stmt->execute();
                     return false;
                 }
             }
@@ -69,16 +66,10 @@ function login($email, $password, $pdo) {
 }
 
 function checkbrute($user_id, $pdo) {
-    // get current time
-    $now = time();
-
-    // count login attempts from the last 2 hours.
-    $valid_attempts = $now - (2 * 60 * 60);
-
     if($stmt = $pdo->prepare("SELECT time
                               FROM login_attempts
                               WHERE user_id = ?
-                              AND time > '$valid_attempts'")) {
+                              AND time BETWEEN DATE(adddate(now(),interval -2 HOUR)) AND NOW()")) {
         $stmt->execute(array($user_id));
         if ($stmt->rowcount() > 5) {
             return true;
