@@ -3,33 +3,32 @@
         <?php if (login_check($pdo) == true) : ?>
             <h1>Welcome <?php echo htmlentities($_SESSION['username']); ?>!</h1>
                 <?php
-                    $sql = 'SELECT *
-                            FROM combat
-                            WHERE (attacker_id =' . $_SESSION['user_id'] . 'OR defender_id =' . $_SESSION['user_id'] . ') AND `timestamp` BETWEEN DATE(adddate(now(),interval -1 day)) AND NOW()
-                            ORDER BY `timestamp`';
 
-                    if ($result = $pdo->query($sql)) {
-
-                        /* fetch object array */
-                        while ($row = $result->fetch()) {
-
+                    // get recent combat
+                    $stmt = $pdo->prepare("SELECT c.*
+                                           FROM combat AS c
+                                           WHERE (c.attacker_id = :user_id OR c.defender_id = :user_id) AND c.`timestamp` BETWEEN DATE(adddate(now(),interval -1 day)) AND NOW()
+                                           ORDER BY c.`timestamp`");
+                    $stmt->execute(array(':user_id' => $_SESSION['user_id']));
+                    if ($stmt->rowcount() > 0) {
+                        while ($row = $stmt->fetch()) {
+                            echo $row['attacker_id'] . ' ' . $row['defender_id'] . "\n";
                         }
-                    }
-                    else {
+                    } else {
                         echo 'No recent combat';
                     }
-                    $sql = 'SELECT r.*, c.name
-                        FROM resources AS r
-                        JOIN members AS m ON m.id = r.member_id
-                        JOIN clans AS c ON c.id = m.clan_id
-                        WHERE member_id =' . $_SESSION['user_id'];
 
-                    if ($result = $pdo->query($sql)) {
 
-                        /* fetch object array */
-                        while ($row = $result->fetch()) { ?>
+                    // get clan profile infomration
+                    $stmt = $pdo->prepare("SELECT r.*, c.name
+                                           FROM resources AS r
+                                           JOIN members AS m ON m.id = r.member_id
+                                           JOIN clans AS c ON c.id = m.clan_id
+                                           WHERE member_id = ?");
+                    $stmt->execute(array($_SESSION['user_id']));
+                    $row = $stmt->fetch(); ?>
 
-                            <h3>Clan Information</h3>
+                        <h3>Clan Information</h3>
                             <dl class='dl-horizontal'>
                                 <dt>Name:</dt><dd><?php echo $row['name']; ?> </dd>
                                 <dt>Credits:</dt><dd><?php echo $row['credits']; ?></dd>
@@ -43,15 +42,6 @@
                                 <dt>Tech Level:</dt><dd><?php echo $row['tech_level']; ?></dd>
                                 <dt>Influence:</dt><dd><?php echo $row['influence']; ?></dd>
                             </dl>
-
-                            <?php
-                        }
-                    }
-                    else {
-                        echo 'No Clan Selected';
-                    }
-
-                ?>
 
             <p>Return to <a href="login.php">login page</a></p>
         <?php else : ?>
