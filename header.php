@@ -68,7 +68,7 @@ sec_session_start();
                   </ul>
                 </li>
               </ul>
-              <?php if (login_check($mysqli) == true) : ?>
+              <?php if (login_check($pdo) == true) : ?>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="includes/logout.php">Logout</a></li>
                 </ul>

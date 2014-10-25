@@ -24,86 +24,63 @@ function sec_session_start() {
     session_regenerate_id();    // regenerated the session, delete the old one.
 }
 
+function login($email, $password, $pdo) {
+    if ($stmt = $pdo->prepare("SELECT id, username, password, salt
+                                FROM members
+                                WHERE email = ?
+                                LIMIT 1")) {
+        $stmt->execute(array($email));
+        $row = $stmt->fetch();
 
-function login($email, $password, $mysqli) {
-    // Using prepared statements means that SQL injection is not possible.
-    if ($stmt = $mysqli->prepare("SELECT id, username, password, salt
-        FROM members
-       WHERE email = ?
-        LIMIT 1")) {
-        $stmt->bind_param('s', $email);  // Bind "$email" to parameter.
-        $stmt->execute();    // Execute the prepared query.
-        $stmt->store_result();
-
-        // get variables from result.
-        $stmt->bind_result($user_id, $username, $db_password, $salt);
-        $stmt->fetch();
-
-        // hash the password with the unique salt.
-        $password = hash('sha512', $password . $salt);
-        if ($stmt->num_rows == 1) {
-            // If the user exists we check if the account is locked
-            // from too many login attempts
-
-            if (checkbrute($user_id, $mysqli) == true) {
-                // Account is locked
-                // Send an email to user saying their account is locked
+        $password = hash('sha512', $password . $row['salt']);
+        if ($stmt->rowcount() == 1) {
+            if (checkbrute($row['id'], $pdo) == true) {
+                // add functionality to send email to user saying account is locked
                 return false;
             } else {
-                // Check if the password in the database matches
-                // the password the user submitted.
-                if ($db_password == $password) {
-                    // Password is correct!
-                    // Get the user-agent string of the user.
+                if ($row['password'] == $password) {
+                    //correct password entered
                     $user_browser = $_SERVER['HTTP_USER_AGENT'];
-                    // XSS protection as we might print this value
-                    $user_id = preg_replace("/[^0-9]+/", "", $user_id);
+                    $user_id = preg_replace("/[^0-9]+/", "", $row['id']);
                     $_SESSION['user_id'] = $user_id;
-                    // XSS protection as we might print this value
-                    $username = preg_replace("/[^a-zA-Z0-9_\-]+/",
-                                                                "",
-                                                                $username);
+                    $username = preg_replace("/[^a-zA-Z0-9_\-]+/", "", $row['username']);
                     $_SESSION['username'] = $username;
-                    $_SESSION['login_string'] = hash('sha512',
-                              $password . $user_browser);
+                    $_SESSION['login_string'] = hash('sha512', $password . $user_browser);
                     // Login successful.
                     return true;
                 } else {
-                    // Password is not correct
-                    // We record this attempt in the database
+                    //invalid login attempt
                     $now = time();
-                    $mysqli->query("INSERT INTO login_attempts(user_id, time)
+                    $user_id = $row['id'];
+                    /*$sql = "INSERT INTO login_attempts (user_id, time)
+                            VALUES (" . $user_id . ", '" . $now . "')";
+                    $pdo->query($sql);*/
+                    $pdo->query("INSERT INTO login_attempts(user_id, time)
                                     VALUES ('$user_id', '$now')");
                     return false;
                 }
             }
         } else {
-            // No user exists.
+            // no user exists
             return false;
         }
+
     }
 }
 
-
-function checkbrute($user_id, $mysqli) {
-    // Get timestamp of current time
+function checkbrute($user_id, $pdo) {
+    // get current time
     $now = time();
 
-    // All login attempts are counted from the past 2 hours.
+    // count login attempts from the last 2 hours.
     $valid_attempts = $now - (2 * 60 * 60);
 
-    if ($stmt = $mysqli->prepare("SELECT time
-                             FROM login_attempts
-                             WHERE user_id = ?
-                            AND time > '$valid_attempts'")) {
-        $stmt->bind_param('i', $user_id);
-
-        // Execute the prepared query.
-        $stmt->execute();
-        $stmt->store_result();
-
-        // If there have been more than 5 failed logins
-        if ($stmt->num_rows > 5) {
+    if($stmt = $pdo->prepare("SELECT time
+                              FROM login_attempts
+                              WHERE user_id = ?
+                              AND time > '$valid_attempts'")) {
+        $stmt->execute(array($user_id));
+        if ($stmt->rowcount() > 5) {
             return true;
         } else {
             return false;
@@ -111,55 +88,43 @@ function checkbrute($user_id, $mysqli) {
     }
 }
 
-
-function login_check($mysqli) {
-    // Check if all session variables are set
-    if (isset($_SESSION['user_id'],
-                        $_SESSION['username'],
-                        $_SESSION['login_string'])) {
-
+function login_check($pdo) {
+    if (isset($_SESSION['user_id'], $_SESSION['username'], $_SESSION['login_string'])) {
         $user_id = $_SESSION['user_id'];
         $login_string = $_SESSION['login_string'];
         $username = $_SESSION['username'];
 
-        // Get the user-agent string of the user.
         $user_browser = $_SERVER['HTTP_USER_AGENT'];
 
-        if ($stmt = $mysqli->prepare("SELECT password
-                                      FROM members
-                                      WHERE id = ? LIMIT 1")) {
-            // Bind "$user_id" to parameter.
-            $stmt->bind_param('i', $user_id);
-            $stmt->execute();   // Execute the prepared query.
-            $stmt->store_result();
-
-            if ($stmt->num_rows == 1) {
-                // If the user exists get variables from result.
-                $stmt->bind_result($password);
-                $stmt->fetch();
-                $login_check = hash('sha512', $password . $user_browser);
+        if($stmt = $pdo->prepare("SELECT password
+                                  FROM members
+                                  WHERE id = ?
+                                  LIMIT 1")) {
+            $stmt->execute(array($user_id));
+            if($stmt->rowcount() == 1) {
+                $row = $stmt->fetch();
+                $login_check = hash('sha512', $row['password'] . $user_browser);
 
                 if ($login_check == $login_string) {
-                    // Logged In!!!!
+                    // logged in
                     return true;
                 } else {
-                    // Not logged in
+                    // not logged in
                     return false;
                 }
             } else {
-                // Not logged in
+                // not logged in
                 return false;
             }
         } else {
-            // Not logged in
+            // not logged in
             return false;
         }
     } else {
-        // Not logged in
+        // not logged in
         return false;
     }
 }
-
 
 function esc_url($url) {
 
@@ -190,21 +155,4 @@ function esc_url($url) {
     } else {
         return $url;
     }
-}
-
-
-function get_profile($user_id, $mysqli) {
-        $stmt = $mysqli->prepare("SELECT forename, surname, gender, birthday
-            FROM members
-            WHERE id = ?
-            LIMIT 1");
-        $stmt->execute();    // Execute the prepared query.
-        $stmt->store_result();
-
-        // get variables from result.
-        $stmt->bind_result($forename, $surname, $gender, $birthday);
-        $stmt->fetch();
-
-
-        return $forename;
 }

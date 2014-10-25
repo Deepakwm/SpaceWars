@@ -12,16 +12,16 @@ sec_session_start();
         <link rel="stylesheet" href="styles/main.css" />
     </head>
     <body>
-        <?php if (login_check($mysqli) == true) : ?>
+        <?php if (login_check($pdo) == true) : ?>
             <p>Welcome <?php echo htmlentities($_SESSION['username']); ?>! User <?php echo htmlentities($_SESSION['user_id']); ?>!</p>
             <p>
                 <?php
                     $sql = 'SELECT forename, surname, gender, birthday FROM members WHERE id =' . $_SESSION['user_id'];
 
-                    if ($result = $mysqli->query($sql)) {
+                    if ($result = $pdo->query($sql)) {
 
                         /* fetch object array */
-                        while ($row = $result->fetch_assoc()) {
+                        while ($row = $result->fetch()) {
                             $forename = $row['forename'];
                             $surname = $row['surname'];
                             $birthday = $row['birthday'];
