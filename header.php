@@ -48,21 +48,14 @@ sec_session_start();
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">Clan <span class="caret">      </span></a>
                   <ul class="dropdown-menu" role="menu">
-                    <li><a href="#">Overview</a></li>
+                    <li><a href="clan.php?user=<?php echo $_SESSION['user_id']; ?>">Overview</a></li>
                     <li><a href="#">Upgrades</a></li>
                     <li><a href="#">Recruit</a></li>
                   </ul>
                 <li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Resources <span class="caret">      </span></a>
-                  <ul class="dropdown-menu" role="menu">
-                    <li><a href="#">Overview</a></li>
-                    <li><a href="#">Upgrades</a></li>
-                  </ul>
-                </li>
-                <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">Combat <span class="caret">      </span></a>
                   <ul class="dropdown-menu" role="menu">
-                    <li><a href="#">Summary</a></li>
+                    <li><a href="combat_summary.php">Summary</a></li>
                     <li><a href="#">Attack!</a></li>
                     <li><a href="#">Security</a></li>
                   </ul>

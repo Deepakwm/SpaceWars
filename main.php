@@ -33,7 +33,7 @@
                                 <dt>Name:</dt><dd><?php echo $row['name']; ?> </dd>
                                 <dt>Credits:</dt><dd><?php echo $row['credits']; ?></dd>
                                 <dt>Income Rate:</dt><dd><?php echo $row['income_rate']; ?></dd>
-                                <dt>Energy:</dt><dd><?php echo $row['energy']; ?></dd>
+                                <dt>Energy:</dt><dd><?php echo $row['energy']; ?> / <?php echo $row['max_energy']; ?></dd>
                                 <dt>Energy Refill Rate:</dt><dd><?php echo $row['energy_rate']; ?></dd>
                                 <dt>Units:</dt><dd><?php echo $row['units']; ?></dd>
                                 <dt>Recruitment Rate:</dt><dd><?php echo $row['recruit_rate']; ?></dd>
