@@ -39,7 +39,7 @@ sec_session_start();
                     <li><a href="friends.php">Friends</a></li>
                     <li><a href="#">Guild</a></li>
                     <li><a href="usersearch.php">User Search</a></li>
-                    <li><a href="#">Messages</a></li>
+                    <li><a href="inbox.php">Messages</a></li>
                     <li class="divider"></li>
                     <li><a href="#">Preferences</a></li>
                     <li><a href="includes/logout.php">Logout</a></li>
