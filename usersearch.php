@@ -22,9 +22,10 @@
                 if(preg_match("/[A-Z|a-z]+/", $_POST['search'])){
                     $search = $_POST['search'];
 
-                    $stmt = $pdo->prepare("SELECT m.id, m.username, m.is_premium, c.name as clan
+                    $stmt = $pdo->prepare("SELECT m.id, m.username, m.is_premium, c.name as clan, g.name as guild
                                            FROM members AS m
                                            JOIN clans AS c ON c.id = m.clan_id
+                                           LEFT JOIN guilds AS g ON g.id = m.guild_id
                                            WHERE m.username LIKE :search OR
                                                  m.forename LIKE :search OR
                                                  m.surname LIKE :search");
@@ -32,8 +33,13 @@
 
                     if ($stmt->rowcount() > 0) {
                         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                          if($row['guild'] == NULL) {
+                            $guild = 'No Guild';
+                          } else {
+                            $guild = $row['guild'];
+                          }
                             ?>
-                            <dt><a href="user.php?user=<?php echo $row['id']; ?>"><?php echo $row['username']; ?></a> - <?php echo $row['clan']; ?></dt>
+                            <dt><a href="user.php?user=<?php echo $row['id']; ?>"><?php echo $row['username']; ?></a> - <?php echo $row['clan']; ?> - <?php echo $guild; ?></dt>
                             <?php
                         }
                     } else {
