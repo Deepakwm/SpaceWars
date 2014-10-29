@@ -3,6 +3,12 @@ include_once 'includes/db_connect.php';
 include_once 'includes/functions.php';
 
 sec_session_start();
+if (isset($_SESSION['user_id'])) {
+  $mail = get_new_mail($_SESSION['user_id'], $pdo);
+} else {
+  $mail = 0;
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -39,10 +45,17 @@ sec_session_start();
                     <li><a href="friends.php">Friends</a></li>
                     <li><a href="#">Guild</a></li>
                     <li><a href="usersearch.php">User Search</a></li>
-                    <li><a href="inbox.php">Messages</a></li>
                     <li class="divider"></li>
                     <li><a href="#">Preferences</a></li>
                     <li><a href="includes/logout.php">Logout</a></li>
+                  </ul>
+                </li>
+                <li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Messages <?php if ($mail != 0){ ?>(<?php echo $mail; ?>) <?php } ?> <span class="caret">      </span></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="inbox.php">Inbox <?php if ($mail != 0){ ?>(<?php echo $mail; ?>) <?php } ?></a></li>
+                    <li><a href="outbox.php">Sent</a></li>
+                    <li><a href="send_message.php">New</a></li>
                   </ul>
                 </li>
                 <li class="dropdown">
@@ -52,6 +65,7 @@ sec_session_start();
                     <li><a href="#">Upgrades</a></li>
                     <li><a href="#">Recruit</a></li>
                   </ul>
+                </li>
                 <li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">Combat <span class="caret">      </span></a>
                   <ul class="dropdown-menu" role="menu">
