@@ -147,3 +147,12 @@ function esc_url($url) {
         return $url;
     }
 }
+
+function get_new_mail($user_id, $pdo) {
+
+    $stmt = $pdo->prepare("SELECT *
+                           FROM messages
+                           WHERE to_user = ? AND is_read <> 1 AND deleted <> 1");
+    $stmt->execute(array($user_id));
+    return $stmt->rowcount();
+}
