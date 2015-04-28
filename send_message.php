@@ -24,7 +24,7 @@
                   </div>
                   <div class="form-group">
                     <div class="col-sm-offset-2 col-sm-4">
-                      <button type="submit" class="btn btn-default" value="Search">Search</button>
+                      <button type="submit" class="btn btn-default" value="Send">Send Message</button>
                     </div>
                   </div>
                 </form>
