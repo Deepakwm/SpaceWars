@@ -14,7 +14,7 @@
                     $stmt->execute(array(':user_id' => $_SESSION['user_id']));
                     if ($stmt->rowcount() > 0) {
                         while ($row = $stmt->fetch()) {
-                            echo $row['attacker'] . ' ' . $row['defender'] . "\n";
+                            echo 'Attacker: '.$row['attacker'] . '<br />Defender: ' . $row['defender'] . "\n";
                         }
                     } else {
                         echo 'No combat in the last 30 days';

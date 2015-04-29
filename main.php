@@ -11,6 +11,7 @@
                                            ORDER BY c.`timestamp`");
                     $stmt->execute(array(':user_id' => $_SESSION['user_id']));
                     if ($stmt->rowcount() > 0) {
+                        ?><h3>Recent Combat</h3><?php 
                         while ($row = $stmt->fetch()) {
                             echo $row['attacker_id'] . ' ' . $row['defender_id'] . "\n";
                         }
